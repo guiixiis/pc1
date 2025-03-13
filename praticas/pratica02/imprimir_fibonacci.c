@@ -1,8 +1,6 @@
 #include <stdio.h>
-printf("Guilherme Gomes Ferreira");
 
 int main() {
+    printf("");
   return 0;
 }
-
-

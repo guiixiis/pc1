@@ -47,8 +47,13 @@ gcc nome_do_arquivo.c -lm
 ```shell
 ./a.exe
 ```
-o %f - serve para formatar o número 
-
-     Aprendendo na aula de hoje, sobre impressões em c.
-     Por exemplo: Decimais, inteiros, caracteres, fibonacci.
-     
+## Aprendendo na aula de hoje, sobre impressões em c.
+```shell
+Por exemplo: Decimais, inteiros, caracteres, fibonacci.
+```
+## Comando caso o ant-vírus barre
+```shell
+gcc imprimir_nota_legal.c -lm -o a.out
+#Logo em seguida
+./a.out
+```

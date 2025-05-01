@@ -41,8 +41,8 @@ cd aula01
 ```
 2. Compile o Programa
 ```shell
-gcc nome_do_arquivo.c -lm
-```
+gcc nome_do_arquivo.c -lm -o a.out  para conferir - ./a.out
+``
 3. Execute o Programa Compilado
 ```shell
 ./a.exe
@@ -57,3 +57,15 @@ gcc imprimir_nota_legal.c -lm -o a.out
 #Logo em seguida
 ./a.out
 ```
+  ## Aprendendo na aula de hoje sobre os tipos de dados e modificadores em c
+  ```shell
+    sobre subir para o git hub
+    git add . 
+    git commit - m "Exemplo do q aprendeu"
+    git push origin develop
+    git switch main 
+    git merge develop
+    git push origin main 
+
+    ## aprendendo na aula de hoje sobre como utilizar o else 
+  `` 

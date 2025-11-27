@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Forca — Séries & Filmes (Clássicos)</title>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#071127; --glass: rgba(255,255,255,0.03);
+      --accent:#7c3aed; --accent-2:#06b6d4; --muted:#9fb0c8; --win:#10b981; --lose:#ef4444;
+      --glass-2: rgba(255,255,255,0.02);
+      font-synthesis: none;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system,"Segoe UI", Roboto, 'Helvetica Neue', Arial;background:radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent), linear-gradient(180deg,var(--bg), #031026 150%);color:#e6f0fb;display:flex;align-items:center;justify-content:center;padding:28px}
+
+    .wrap{width:100%;max-width:1100px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:16px;padding:18px;display:grid;grid-template-columns:420px 1fr;gap:18px;box-shadow:0 10px 40px rgba(2,6,23,0.7)}
+
+    header{display:flex;gap:12px;align-items:center}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#021224}
+    h1{margin:0;font-size:20px}
+    .subtitle{color:var(--muted);font-size:13px}
+
+    .panel{background:linear-gradient(180deg,var(--card), rgba(255,255,255,0.01));padding:14px;border-radius:12px}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    select,input[type=text],textarea{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    textarea{resize:vertical}
+
+    .row{display:flex;gap:8px}
+    .row > *{flex:1}
+    .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;padding:10px 12px;border-radius:10px;color:#021224;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+
+    .platforms{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:8px 10px;border-radius:999px;background:var(--glass);font-size:13px;cursor:pointer}
+    .chip.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#021224;font-weight:700}
+
+    /* main game area */
+    .game-top{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .word{font-size:34px;letter-spacing:8px;padding:14px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);text-align:center}
+    .kbd{display:grid;grid-template-columns:repeat(13,1fr);gap:6px;margin-top:12px}
+    .key{padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);text-align:center;cursor:pointer;user-select:none}
+    .key.used{opacity:0.35;pointer-events:none}
+
+    .meta{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:10px}
+    .meta .small{font-size:13px;color:var(--muted)}
+
+    /* canvas container */
+    .canvas-wrap{display:flex;align-items:center;justify-content:center;padding:12px}
+    canvas{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:12px;max-width:100%}
+
+    /* animated SVG avatar */
+    .avatar{width:110px;height:110px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);display:flex;align-items:center;justify-content:center}
+
+    /* hint / badges */
+    .badges{display:flex;gap:8px;flex-wrap:wrap}
+    .badge{padding:8px 10px;border-radius:10px;background:var(--glass);font-size:13px}
+
+    /* difficulty indicator */
+    .difficulty{display:flex;gap:6px;align-items:center}
+    .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.06)}
+    .dot.on{background:var(--accent)}
+
+    /* responsive */
+    @media (max-width:980px){.wrap{grid-template-columns:1fr} .kbd{grid-template-columns:repeat(10,1fr)} }
+  </style>
+</head>
+<body>
+  <div class="wrap" role="application">
+    <div>
+      <header>
+        <div class="logo">F&amp;F</div>
+        <div>
+          <h1>Forca — Séries & Filmes</h1>
+          <div class="subtitle">Clássicos e favoritos de Netflix, Amazon, Disney+, HBO e mais. Personalize e jogue!</div>
+        </div>
+      </header>
+
+      <div style="height:12px"></div>
+
+      <div class="panel">
+        <label>Selecione plataformas</label>
+        <div class="platforms" id="platforms">
+          <div class="chip active" data-pf="netflix">Netflix</div>
+          <div class="chip active" data-pf="prime">Amazon Prime</div>
+          <div class="chip active" data-pf="disney">Disney+</div>
+          <div class="chip active" data-pf="hbo">HBO</div>
+          <div class="chip active" data-pf="classic">Clássicos (Cinema)</div>
+          <div class="chip active" data-pf="anime">Animes</div>
+        </div>
+
+        <div style="height:10px"></div>
+        <label>Dificuldade</label>
+        <div class="row">
+          <select id="difficulty">
+            <option value="easy">Fácil — 8 tentativas</option>
+            <option value="normal" selected>Normal — 6 tentativas</option>
+            <option value="hard">Difícil — 4 tentativas</option>
+          </select>
+          <select id="mode">
+            <option value="titles" selected>Títulos (ex.: Stranger Things)</option>
+            <option value="characters">Personagens</option>
+            <option value="mixed">Misturado</option>
+          </select>
+        </div>
+
+        <div style="height:10px"></div>
+        <label>Opções do jogador</label>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="startBtn">Iniciar partida</button>
+          <button class="btn ghost" id="resetBtn">Resetar</button>
+        </div>
+
+        <div style="height:10px"></div>
+        <label>Lista personalizada (opcional)</label>
+        <textarea id="customList" rows="4" placeholder="Adicione títulos ou personagens, uma por linha — acentos permitidos"></textarea>
+
+        <div style="height:10px"></div>
+        <div style="font-size:13px;color:var(--muted)">Dicas: Hints revelam letra — custo varia por dificuldade. Você pode filtrar plataformas para tema do jogo.</div>
+      </div>
+
+      <div style="height:12px"></div>
+
+      <div class="panel" style="display:flex;gap:12px;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-weight:700">Estatísticas</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:6px">Vitórias: <span id="wins">0</span> · Derrotas: <span id="losses">0</span></div>
+        </div>
+        <div class="badges">
+          <div class="badge">Dica: pressione a tecla (A–Z)</div>
+          <div class="badge">Tema: Séries & Filmes</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel" style="display:flex;gap:12px;align-items:center;justify-content:space-between">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="avatar">
+            <!-- animated SVG character (simple stick figure with head that can swing) -->
+            <svg id="avatarSVG" width="92" height="92" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <filter id="shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.12"/></filter>
+              </defs>
+              <g transform="translate(10,6)">
+                <g id="gall" filter="url(#shadow)">
+                  <line id="rope" x1="80" y1="0" x2="80" y2="18" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
+                  <circle id="head" cx="80" cy="36" r="10" fill="#071127" stroke="#9fb0c8" stroke-width="2"/>
+                  <line id="body" x1="80" y1="46" x2="80" y2="70" stroke="#9fb0c8" stroke-width="3" stroke-linecap="round"/>
+                  <line id="larm" x1="80" y1="52" x2="66" y2="62" stroke="#9fb0c8" stroke-width="3" stroke-linecap="round"/>
+                  <line id="rarm" x1="80" y1="52" x2="94" y2="62" stroke="#9fb0c8" stroke-width="3" stroke-linecap="round"/>
+                  <line id="lleg" x1="80" y1="70" x2="70" y2="86" stroke="#9fb0c8" stroke-width="3" stroke-linecap="round"/>
+                  <line id="rleg" x1="80" y1="70" x2="90" y2="86" stroke="#9fb0c8" stroke-width="3" stroke-linecap="round"/>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:18px" id="status">Pronto para jogar</div>
+            <div style="color:var(--muted);font-size:13px" id="subtitle">Selecione plataformas e clique em Iniciar</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="small" style="font-size:13px;color:var(--muted)">Tentativas restantes</div>
+          <div style="font-weight:800;font-size:22px" id="lives">0</div>
+        </div>
+      </div>
+
+      <div style="height:12px"></div>
+
+      <div class="panel">
+        <div class="game-top">
+          <div style="flex:1">
+            <div class="word" id="wordDisplay">_ _ _ _ _</div>
+            <div class="kbd" id="keyboard"></div>
+            <div class="meta">
+              <div class="small">Palavra atual: <span id="currentWord'">-</span></div>
+              <div>
+                <button class="btn ghost" id="hintBtn">Pedir dica (revela 1 letra)</button>
+                <button class="btn ghost" id="revealBtn">Revelar palavra (custa)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:12px"></div>
+      <div class="panel canvas-wrap">
+        <canvas id="hangmanCanvas" width="560" height="360"></canvas>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Utilitários
+const strip = s => s.normalize('NFD').replace(/\p{Diacritic}/gu,'').toUpperCase();
+const rand = a=> a[Math.floor(Math.random()*a.length)];
+
+// Elements
+const platformChips = document.getElementById('platforms');
+const startBtn = document.getElementById('startBtn');
+const resetBtn = document.getElementById('resetBtn');
+const difficultyEl = document.getElementById('difficulty');
+const modeEl = document.getElementById('mode');
+const customList = document.getElementById('customList');
+const statusEl = document.getElementById('status');
+const subtitleEl = document.getElementById('subtitle');
+const livesEl = document.getElementById('lives');
+const wordDisplay = document.getElementById('wordDisplay');
+const keyboardEl = document.getElementById('keyboard');
+const hintBtn = document.getElementById('hintBtn');
+const revealBtn = document.getElementById('revealBtn');
+const winsEl = document.getElementById('wins');
+const lossesEl = document.getElementById('losses');
+
+const canvas = document.getElementById('hangmanCanvas'); const ctx = canvas.getContext('2d');
+const avatarSVG = document.getElementById('avatarSVG');
+
+// Game state
+let state = { pool:[], word:'', display:[], used:new Set(), lives:6, maxLives:6, running:false, wins:0, losses:0 };
+
+// Library of titles (sample curated list across platforms). You can extend the list in customList.
+const LIB = {
+  netflix: ["STRANGER THINGS","THE CROWN","BLACK MIRROR","NARCOS","HOUSE OF CARDS","THE QUEEN'S GAMBIT"],
+  prime: ["THE MARVELOUS MRS MAISel","THE BOYS","FLEABAG","MANCHESTER BY THE SEA","THE EXPANSE"],
+  disney: ["THE MANDALORIAN","WANDAVISION","LUCIFER","MOANA","THE SIMPSONS"],
+  hbo: ["GAME OF THRONES","SIX FEET UNDER","TRUE DETECTIVE","THE SOPRANOS","WESTWORLD"],
+  classic: ["CASABLANCA","GODFATHER","PULP FICTION","FORREST GUMP","BACK TO THE FUTURE"],
+  anime: ["DEATH NOTE","ATTACK ON TITAN","SPIRITED AWAY","NARUTO","FULLMETAL ALCHEMIST"]
+};
+
+// --- Platform toggles ---
+platformChips.addEventListener('click', e=>{
+  const chip = e.target.closest('.chip'); if(!chip) return; chip.classList.toggle('active');
+});
+
+// --- Keyboard build ---
+function buildKeyboard(){ keyboardEl.innerHTML=''; const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  letters.forEach(l=>{ const b=document.createElement('div'); b.className='key'; b.textContent=l; b.addEventListener('click',()=> pressKey(l)); keyboardEl.appendChild(b); });
+}
+
+function setKeyUsed(ch){ Array.from(keyboardEl.children).forEach(b=>{ if(b.textContent===ch) b.classList.add('used'); }); }
+
+// --- Canvas drawing (fancier) ---
+function drawScaffold(){ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.lineWidth=6; ctx.strokeStyle='rgba(255,255,255,0.9)'; ctx.lineCap='round';
+  // base
+  ctx.beginPath(); ctx.moveTo(100,320); ctx.lineTo(260,320); ctx.stroke();
+  // pole
+  ctx.beginPath(); ctx.moveTo(160,320); ctx.lineTo(160,40); ctx.lineTo(340,40); ctx.lineTo(340,80); ctx.stroke();
+  // rope
+  ctx.beginPath(); ctx.moveTo(340,40); ctx.lineTo(340,92); ctx.stroke();
+}
+
+const parts = [
+  // head
+  function(p){ ctx.beginPath(); ctx.lineWidth=4; const x=340,y=120,r=28; ctx.arc(x, y - (1-p)*40, r, 0, Math.PI*2); ctx.stroke(); },
+  // body
+  function(p){ ctx.beginPath(); const x=340,y1=148,y2=230; ctx.moveTo(x, y1); ctx.lineTo(x, y1 + (y2-y1)*p); ctx.stroke(); },
+  // left arm
+  function(p){ ctx.beginPath(); const x=340,y=160; ctx.moveTo(x,y); ctx.lineTo(x-60*p, y+30*p); ctx.stroke(); },
+  // right arm
+  function(p){ ctx.beginPath(); const x=340,y=160; ctx.moveTo(x,y); ctx.lineTo(x+60*p, y+30*p); ctx.stroke(); },
+  // left leg
+  function(p){ ctx.beginPath(); const x=340,y=230; ctx.moveTo(x,y); ctx.lineTo(x-50*p, y+70*p); ctx.stroke(); },
+  // right leg
+  function(p){ ctx.beginPath(); const x=340,y=230; ctx.moveTo(x,y); ctx.lineTo(x+50*p, y+70*p); ctx.stroke(); }
+];
+
+function renderParts(count){ drawScaffold(); for(let i=0;i<count && i<parts.length;i++) parts[i](1); }
+
+function animatePart(i){ const dur=420, start=performance.now(); function step(t){ let p=Math.min(1,(t-start)/dur); const eased=Math.sin(p*(Math.PI/2)); drawScaffold(); for(let k=0;k<i;k++) parts[k](1); parts[i](eased); if(p<1) requestAnimationFrame(step); } requestAnimationFrame(step);} 
+
+// Avatar swing on lose/win
+function swingAvatar(strength=6,duration=1200){ const g = document.getElementById('gall'); const start=performance.now(); function frame(t){ const p=Math.min(1,(t-start)/duration); const ang = Math.sin(p*Math.PI*4)*strength*(1-p); g.setAttribute('transform',`translate(10,6) rotate(${ang} 70 20)`); if(p<1) requestAnimationFrame(frame); else g.setAttribute('transform','translate(10,6)'); } requestAnimationFrame(frame); }
+
+// --- Pool creation ---
+function buildPool(){ const active = Array.from(document.querySelectorAll('.chip.active')).map(c=>c.dataset.pf);
+  let pool = [];
+  active.forEach(pf=>{ if(LIB[pf]) pool = pool.concat(LIB[pf]); });
+  // custom
+  const custom = customList.value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  pool = pool.concat(custom);
+  if(pool.length===0) pool = ['STRANGER THINGS','THE MANDALORIAN','GODFATHER','CASABLANCA'];
+  state.pool = pool;
+}
+
+function pickWord(){ buildPool(); const raw = rand(state.pool); return raw; }
+
+// --- Game lifecycle ---
+function initGame(){ buildKeyboard(); buildPool(); state.word = pickWord(); state.display = strip(state.word).split('').map(ch=> /[A-Z0-9]/.test(ch)? '_' : ch);
+  const diff = difficultyEl.value; state.maxLives = diff==='easy'?8:diff==='hard'?4:6; state.lives = state.maxLives; state.used = new Set(); state.running = true; updateUI(); renderParts(0); statusEl.textContent='Jogando'; subtitleEl.textContent = 'Tema: ' + Array.from(document.querySelectorAll('.chip.active')).map(c=>c.textContent).join(', ');
+}
+
+function updateUI(){ livesEl.textContent = state.lives; wordDisplay.innerHTML = state.display.map((ch,i)=>`<span style="display:inline-block;min-width:18px">${ch==='_'? '<span style="opacity:0.92">_</span>': ch}</span>`).join(' ');
+  // used keys
+  state.used.forEach(k=> setKeyUsed(k));
+}
+
+function pressKey(k){ if(!state.running) return; k=k.toUpperCase(); if(state.used.has(k)) return; state.used.add(k); setKeyUsed(k); const raw = strip(state.word);
+  let found=false; for(let i=0;i<raw.length;i++){ if(raw[i]===k){ state.display[i]=state.word[i]; found=true; } }
+  if(!found){ state.lives--; animatePart(state.maxLives - state.lives - 1); }
+  updateUI(); checkEnd(); }
+
+function checkEnd(){ if(state.display.join('')===state.word){ state.running=false; state.wins++; winsEl.textContent=state.wins; statusEl.textContent='Você venceu!'; swingAvatar(8,1500); } if(state.lives<=0){ state.running=false; state.losses++; lossesEl.textContent=state.losses; statusEl.textContent='Você perdeu'; revealAll(); swingAvatar(12,1600); }
+}
+
+function revealAll(){ state.display = state.word.split(''); updateUI(); renderParts(parts.length); }
+
+// hint logic
+hintBtn.addEventListener('click', ()=>{
+  if(!state.running) return; // cost depends on difficulty
+  const cost = difficultyEl.value==='hard'?2:1;
+  if(state.lives-cost<=0){ alert('Dica indisponível: acabaria o jogo.'); return; }
+  // pick an unrevealed letter
+  const raw = strip(state.word); for(let i=0;i<raw.length;i++){ if(state.display[i]==='_'){ const ch = raw[i]; pressKey(ch); state.lives -= (cost-0); updateUI(); break; } }
+});
+
+revealBtn.addEventListener('click', ()=>{ if(!state.running) return; if(!confirm('Revelar a palavra agora? Isso encerra a partida.')) return; state.lives=0; checkEnd(); });
+
+// keyboard physical
+window.addEventListener('keydown', e=>{ if(!state.running) return; const k = e.key.toUpperCase(); if(/^[A-Z0-9]$/.test(k)) pressKey(k); });
+
+function setKeyUsed(ch){ Array.from(keyboardEl.children).forEach(b=>{ if(b.textContent===ch) b.classList.add('used'); }); }
+
+// start / reset
+startBtn.addEventListener('click', ()=>{ initGame(); });
+resetBtn.addEventListener('click', ()=>{ customList.value=''; initGame(); });
+
+// initial
+buildKeyboard(); drawScaffold();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Spotifake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="/static/css/app.css"/>
+</head>
+<body>
+
+<!-- MODALS -->
+<!-- Profile Modal -->
+<div class="modal-overlay" id="profileOverlay">
+  <div class="modal profile-modal">
+    <div class="modal-head"><h2>Editar Perfil</h2><button class="modal-close" onclick="closeModal('profileOverlay')"><i class="fas fa-times"></i></button></div>
+    <div class="profile-avatar-pick">
+      <div class="profile-avatar-big" id="profileAvatarBig">U</div>
+      <div class="color-picks" id="colorPicks"></div>
+    </div>
+    <div class="form-field"><label>Nome</label><input type="text" id="profileName" placeholder="Seu nome"/></div>
+    <div class="form-field"><label>Bio</label><textarea id="profileBio" placeholder="Fale um pouco sobre você..." rows="3"></textarea></div>
+    <button class="btn-accent full" id="saveProfileBtn">Salvar</button>
+  </div>
+</div>
+
+<!-- Queue Modal -->
+<div class="modal-overlay" id="queueOverlay">
+  <div class="modal queue-modal">
+    <div class="modal-head"><h2><i class="fas fa-list-ul"></i> Fila de Reprodução</h2><button class="modal-close" onclick="closeModal('queueOverlay')"><i class="fas fa-times"></i></button></div>
+    <div class="queue-now"><p class="queue-label">TOCANDO AGORA</p><div id="queueNow"></div></div>
+    <div class="queue-next"><p class="queue-label">A SEGUIR</p><div id="queueNext"></div></div>
+  </div>
+</div>
+
+<!-- Equalizer Modal -->
+<div class="modal-overlay" id="eqOverlay">
+  <div class="modal eq-modal">
+    <div class="modal-head"><h2><i class="fas fa-sliders-h"></i> Equalizer</h2><button class="modal-close" onclick="closeModal('eqOverlay')"><i class="fas fa-times"></i></button></div>
+    <div class="eq-presets" id="eqPresets"></div>
+    <div class="eq-bars-wrap" id="eqBars"></div>
+    <button class="btn-ghost" id="eqResetBtn">Resetar</button>
+  </div>
+</div>
+
+<!-- Lyrics Modal -->
+<div class="modal-overlay" id="lyricsOverlay">
+  <div class="modal lyrics-modal">
+    <div class="modal-head"><h2><i class="fas fa-microphone-alt"></i> Letra</h2><button class="modal-close" onclick="closeModal('lyricsOverlay')"><i class="fas fa-times"></i></button></div>
+    <div class="lyrics-content">
+      <img id="lyricsCover" src="" alt=""/>
+      <div class="lyrics-text-wrap">
+        <div class="lyrics-song-title" id="lyricsSongTitle"></div>
+        <div class="lyrics-song-artist" id="lyricsSongArtist"></div>
+        <pre class="lyrics-text" id="lyricsText"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Playlist Modal -->
+<div class="modal-overlay" id="newPlaylistOverlay">
+  <div class="modal small-modal">
+    <div class="modal-head"><h2>Nova Playlist</h2><button class="modal-close" onclick="closeModal('newPlaylistOverlay')"><i class="fas fa-times"></i></button></div>
+    <div class="form-field"><label>Nome da Playlist</label><input type="text" id="newPlaylistName" placeholder="Minha Playlist #1"/></div>
+    <div class="form-field"><label>Descrição (opcional)</label><input type="text" id="newPlaylistDesc" placeholder="Adicione uma descrição"/></div>
+    <div class="modal-error" id="newPlaylistErr"></div>
+    <button class="btn-accent full" id="createPlaylistBtn">Criar</button>
+  </div>
+</div>
+
+<!-- Notifications Panel -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-head"><h3>Notificações</h3><button onclick="closeNotifs()"><i class="fas fa-times"></i></button></div>
+  <div class="notif-list" id="notifList"></div>
+</div>
+<div class="notif-backdrop" id="notifBackdrop" onclick="closeNotifs()"></div>
+
+<!-- Fullscreen Player -->
+<div class="fullscreen" id="fullscreen">
+  <div class="fs-bg" id="fsBg"></div>
+  <button class="fs-close-btn" id="fsCloseBtn"><i class="fas fa-chevron-down"></i></button>
+  <div class="fs-body">
+    <div class="fs-left">
+      <img class="fs-cover" id="fsCover" src="" alt=""/>
+      <canvas id="fsCanvas" class="fs-canvas"></canvas>
+    </div>
+    <div class="fs-right">
+      <div class="fs-song-info">
+        <div class="fs-title" id="fsTitle">—</div>
+        <div class="fs-artist" id="fsArtist">—</div>
+        <div class="fs-album" id="fsAlbum">—</div>
+      </div>
+      <div class="fs-prog-wrap">
+        <span id="fsCurTime">0:00</span>
+        <div class="fs-prog" id="fsProgBar"><div class="fs-prog-fill" id="fsProgFill"></div><div class="fs-prog-thumb"></div></div>
+        <span id="fsTotTime">0:00</span>
+      </div>
+      <div class="fs-ctrl-row">
+        <button class="fs-ctrl" id="fsShufBtn"><i class="fas fa-random"></i></button>
+        <button class="fs-ctrl" id="fsPrevBtn"><i class="fas fa-step-backward"></i></button>
+        <button class="fs-play-btn" id="fsPlayBtn"><i class="fas fa-play"></i></button>
+        <button class="fs-ctrl" id="fsNextBtn"><i class="fas fa-step-forward"></i></button>
+        <button class="fs-ctrl" id="fsRepBtn"><i class="fas fa-redo"></i></button>
+      </div>
+      <div class="fs-extras">
+        <button class="fs-ctrl small" id="fsHeartBtn"><i class="far fa-heart"></i></button>
+        <button class="fs-ctrl small" id="fsLyricsBtn"><i class="fas fa-microphone-alt"></i></button>
+        <button class="fs-ctrl small" id="fsQueueBtn"><i class="fas fa-list-ul"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div class="app-shell" id="appShell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo" onclick="showView('home')">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+      <span>Spotifake</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="snav active" data-view="home"><i class="fas fa-home"></i><span>Início</span></a>
+      <a class="snav" data-view="search"><i class="fas fa-search"></i><span>Buscar</span></a>
+      <a class="snav" data-view="library"><i class="fas fa-book-open"></i><span>Biblioteca</span></a>
+    </nav>
+
+    <div class="sidebar-section">
+      <button class="sidebar-btn" id="newPlaylistSideBtn"><div class="sb-icon plus"><i class="fas fa-plus"></i></div><span>Nova Playlist</span></button>
+      <button class="sidebar-btn" id="likedSideBtn"><div class="sb-icon liked"><i class="fas fa-heart"></i></div><span>Curtidas</span></button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-pls-label">Suas Playlists</div>
+    <ul class="sidebar-pls" id="sidebarPls"></ul>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="topbar-btn" id="backBtn"><i class="fas fa-chevron-left"></i></button>
+        <button class="topbar-btn" id="fwdBtn"><i class="fas fa-chevron-right"></i></button>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-btn theme-toggle" id="themeBtn"><i class="fas fa-moon"></i></button>
+        <div class="notif-wrap">
+          <button class="topbar-btn notif-btn" id="notifBtn"><i class="fas fa-bell"></i><span class="notif-badge" id="notifBadge" style="display:none"></span></button>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <span class="user-name" id="userName"></span>
+          <i class="fas fa-chevron-down" style="font-size:.7rem;color:#777"></i>
+          <div class="user-dropdown" id="userDropdown">
+            <a onclick="openModal('profileOverlay')"><i class="fas fa-user-edit"></i> Editar Perfil</a>
+            <a onclick="showView('library')"><i class="fas fa-book-open"></i> Minha Biblioteca</a>
+            <div class="dd-divider"></div>
+            <a onclick="doLogout()" class="dd-danger"><i class="fas fa-sign-out-alt"></i> Sair</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEWS CONTAINER -->
+    <div class="views-wrap" id="viewsWrap">
+
+      <!-- HOME -->
+      <div class="view active" id="homeView">
+        <section class="hero-section" id="heroSection">
+          <div class="hero-greeting" id="heroGreeting">Boa tarde</div>
+          <div class="quick-grid" id="quickGrid"></div>
+        </section>
+        <section class="content-section">
+          <div class="sec-head"><h2>🔥 Charts Globais</h2><span class="see-all" onclick="loadCharts();showView('charts')">Ver tudo</span></div>
+          <div class="cards-row" id="chartsRow"></div>
+        </section>
+        <section class="content-section">
+          <div class="sec-head"><h2>🇧🇷 Música Brasileira</h2><span class="see-all" onclick="showView('search')">Explorar</span></div>
+          <div class="cards-row" id="brazilRow"></div>
+        </section>
+        <section class="content-section">
+          <div class="sec-head"><h2>🎵 Playlists em Destaque</h2><span class="see-all" onclick="showView('library')">Ver tudo</span></div>
+          <div class="cards-row" id="playlistsRow"></div>
+        </section>
+        <section class="content-section">
+          <div class="sec-head"><h2>🗓️ Eventos &amp; Shows</h2><span class="see-all" onclick="showView('events')">Ver todos</span></div>
+          <div class="events-row" id="eventsRowHome"></div>
+        </section>
+        <section class="content-section">
+          <div class="sec-head"><h2>📰 Novidades da Semana</h2></div>
+          <div class="news-grid" id="newsGrid"></div>
+        </section>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="view" id="searchView">
+        <div class="search-hero">
+          <div class="search-bar-wrap">
+            <i class="fas fa-search search-ico"></i>
+            <input type="text" id="searchInput" placeholder="Artistas, músicas, playlists..."/>
+            <button class="search-clear-btn" id="searchClearBtn"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <div id="searchBody" class="search-body">
+          <h3 class="genres-title">Explorar Categorias</h3>
+          <div class="genres-grid" id="genresGrid"></div>
+        </div>
+      </div>
+
+      <!-- LIBRARY -->
+      <div class="view" id="libraryView">
+        <div class="library-head">
+          <h1>Sua Biblioteca</h1>
+          <button class="btn-accent-sm" id="newPlaylistLibBtn"><i class="fas fa-plus"></i> Nova Playlist</button>
+        </div>
+        <div class="lib-tabs">
+          <button class="lib-tab active" data-tab="playlists">Playlists</button>
+          <button class="lib-tab" data-tab="liked">Curtidas</button>
+          <button class="lib-tab" data-tab="albums">Álbuns</button>
+        </div>
+        <div class="lib-content" id="libContent"></div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="view" id="chartsView">
+        <div class="view-banner charts-banner">
+          <div class="banner-info"><span class="banner-tag">Charts</span><h1>🔥 Top 50 Global</h1><p>Músicas mais tocadas do mundo</p></div>
+        </div>
+        <div class="track-actions"><button class="btn-play-big" id="chartsPlayBtn"><i class="fas fa-play"></i></button></div>
+        <div class="tracks-container" id="chartsTable"></div>
+      </div>
+
+      <!-- COLLECTION (playlist/album detail) -->
+      <div class="view" id="collView">
+        <div class="coll-banner" id="collBanner"></div>
+        <div class="track-actions">
+          <button class="btn-play-big" id="collPlayBtn"><i class="fas fa-play"></i></button>
+          <button class="btn-radio" id="collRadioBtn"><i class="fas fa-broadcast-tower"></i> Rádio</button>
+          <button class="btn-add-pl" id="collAddPlaylistBtn" style="display:none"><i class="fas fa-plus"></i> Adicionar à Playlist</button>
+        </div>
+        <div class="track-table-head">
+          <span>#</span><span>Título</span><span class="hide-mobile">Álbum</span><span class="hide-mobile">Ano</span><span><i class="fas fa-clock"></i></span>
+        </div>
+        <div class="tracks-container" id="collTable"></div>
+      </div>
+
+      <!-- RADIO -->
+      <div class="view" id="radioView">
+        <div class="view-banner radio-banner">
+          <div class="banner-info"><span class="banner-tag">Rádio</span><h1 id="radioTitle">Rádio</h1><p id="radioDesc">Mix personalizado</p></div>
+        </div>
+        <div class="track-actions"><button class="btn-play-big" id="radioPlayBtn"><i class="fas fa-play"></i></button></div>
+        <div class="tracks-container" id="radioTable"></div>
+      </div>
+
+      <!-- EVENTS -->
+      <div class="view" id="eventsView">
+        <div class="view-banner events-banner"><div class="banner-info"><span class="banner-tag">Ao Vivo</span><h1>🎭 Eventos &amp; Shows</h1><p>Os maiores eventos musicais do Brasil</p></div></div>
+        <div class="events-full-grid" id="eventsGrid"></div>
+      </div>
+
+      <!-- LIKED -->
+      <div class="view" id="likedView">
+        <div class="view-banner liked-banner">
+          <div class="liked-cover-icon"><i class="fas fa-heart"></i></div>
+          <div class="banner-info"><span class="banner-tag">Playlist</span><h1>Músicas Curtidas</h1><p id="likedCountText">0 músicas</p></div>
+        </div>
+        <div class="track-actions"><button class="btn-play-big" id="likedPlayBtn"><i class="fas fa-play"></i></button></div>
+        <div class="tracks-container" id="likedTable"></div>
+      </div>
+
+    </div><!-- /views-wrap -->
+  </div><!-- /main-area -->
+</div><!-- /app-shell -->
+
+<!-- PLAYER -->
+<div class="player" id="player">
+  <!-- viz bar -->
+  <div class="player-viz" id="playerViz"></div>
+
+  <div class="player-left">
+    <div class="player-cover" id="playerCover" onclick="openFullscreen()">
+      <img id="playerCoverImg" src="" alt=""/>
+      <div class="player-cover-overlay"><i class="fas fa-expand-alt"></i></div>
+    </div>
+    <div class="player-song-info">
+      <div class="player-song-title" id="playerTitle">Selecione uma música</div>
+      <div class="player-song-artist" id="playerArtist">—</div>
+    </div>
+    <div class="player-quick-actions">
+      <button class="pctrl small" id="heartBtn" title="Curtir"><i class="far fa-heart"></i></button>
+      <button class="pctrl small" id="lyricsBtn" title="Letra"><i class="fas fa-microphone-alt"></i></button>
+    </div>
+  </div>
+
+  <div class="player-center">
+    <div class="pctrl-row">
+      <button class="pctrl" id="shuffleBtn" title="Aleatório"><i class="fas fa-random"></i></button>
+      <button class="pctrl" id="prevBtn"><i class="fas fa-step-backward"></i></button>
+      <button class="pctrl play-main" id="playBtn"><i class="fas fa-play"></i></button>
+      <button class="pctrl" id="nextBtn"><i class="fas fa-step-forward"></i></button>
+      <button class="pctrl" id="repeatBtn" title="Repetir"><i class="fas fa-redo"></i></button>
+    </div>
+    <div class="prog-row">
+      <span class="prog-t" id="curTime">0:00</span>
+      <div class="prog-bar" id="progBar"><div class="prog-fill" id="progFill"></div><div class="prog-thumb"></div></div>
+      <span class="prog-t" id="totTime">0:00</span>
+    </div>
+  </div>
+
+  <div class="player-right">
+    <button class="pctrl small" id="queueBtn" title="Fila"><i class="fas fa-list-ul"></i></button>
+    <button class="pctrl small" id="eqBtn" title="Equalizer"><i class="fas fa-sliders-h"></i></button>
+    <button class="pctrl small" id="radioMiniBtn" title="Iniciar Rádio"><i class="fas fa-broadcast-tower"></i></button>
+    <button class="pctrl small" id="fsBtnMain" title="Tela Cheia"><i class="fas fa-expand-alt"></i></button>
+    <i class="fas fa-volume-up vol-ico" id="volIcon"></i>
+    <div class="vol-bar" id="volBar"><div class="vol-fill" id="volFill" style="width:70%"></div><div class="vol-thumb" style="left:70%"></div></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

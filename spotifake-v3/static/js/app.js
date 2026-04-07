@@ -31,6 +31,46 @@ async function api(url, opts = {}) {
   } catch (e) { console.error('API error', url, e); return null; }
 }
 
+// ── Caching Layer ───────────────────────────────
+async function cachedAPI(url, ttlSecs = 300) {
+  const key = `cache:${url}`;
+  const now = Date.now();
+  const cached = localStorage.getItem(key);
+  if (cached) {
+    try {
+      const { data, exp } = JSON.parse(cached);
+      if (exp > now) return data;
+    } catch (e) {}
+  }
+  const data = await api(url);
+  if (data) localStorage.setItem(key, JSON.stringify({ data, exp: now + ttlSecs * 1000 }));
+  return data;
+}
+
+// ── Lazy Loading ─────────────────────────────────
+function setupLazyLoading() {
+  if (!IntersectionObserver) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        if (img.dataset.src) { img.src = img.dataset.src; img.removeAttribute('data-src'); }
+        observer.unobserve(img);
+      }
+    });
+  }, { rootMargin: '50px' });
+  
+  document.querySelectorAll('img[data-src]').forEach(img => observer.observe(img));
+  
+  // Re-run when new images are added
+  const container = $('viewsWrap');
+  if (container) {
+    new MutationObserver(() => {
+      document.querySelectorAll('img[data-src]').forEach(img => observer.observe(img));
+    }).observe(container, { subtree: true, childList: true });
+  }
+}
+
 // ── State ────────────────────────────────────────
 const S = {
   user: null, likes: new Set(),
@@ -60,7 +100,7 @@ async function boot() {
 
   // Load data
   const [songsR, plsR, eventsR] = await Promise.all([
-    api('/api/songs'), api('/api/playlists'), api('/api/events')
+    cachedAPI('/api/songs', 3600), cachedAPI('/api/playlists', 3600), cachedAPI('/api/events', 7200)
   ]);
 
   if (songsR) S.songs = songsR;
@@ -73,12 +113,14 @@ async function boot() {
   renderHome();
   updateNotifBadge();
   setupNav();
+  setupMobileMenu();
   setupPlayer();
   setupModals();
   setupSearch();
   setupTheme();
   setupEQ();
   setGreeting();
+  setupLazyLoading();
 }
 
 // ── Theme ─────────────────────────────────────────
@@ -93,6 +135,46 @@ function setupTheme() {
   if (btn) btn.addEventListener('click', () => {
     const t = S.theme === 'dark' ? 'light' : 'dark';
     applyTheme(t); localStorage.setItem('theme', t);
+  });
+}
+
+// ── Mobile Menu Toggle ────────────────────────────
+function setupMobileMenu() {
+  const menuBtn = $('menuBtn');
+  const sidebar = $('sidebar');
+  const overlay = $('sidebarOverlay');
+  
+  if (!menuBtn || !sidebar || !overlay) return;
+  
+  // Show menu button on mobile
+  const updateMenuBtnVisibility = () => {
+    menuBtn.style.display = window.innerWidth <= 600 ? 'flex' : 'none';
+  };
+  updateMenuBtnVisibility();
+  window.addEventListener('resize', updateMenuBtnVisibility);
+  
+  // Toggle sidebar
+  menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+  });
+  
+  // Close sidebar when clicking overlay
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+  
+  // Close sidebar when clicking a link
+  const sidebarLinks = sidebar.querySelectorAll('a, .snav, .sidebar-btn, .sidebar-logo');
+  sidebarLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 600) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+      }
+    });
   });
 }
 

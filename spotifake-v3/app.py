@@ -7,6 +7,20 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'spotifake-v3-ultra-secret-2024')
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 
+# ── Performance & Caching ────────────────────────
+@app.after_request
+def set_cache_headers(response):
+    """Set cache headers for static assets & API responses"""
+    if request.path.startswith('/static/'):
+        response.cache_control.max_age = 31536000  # 1 year for static files
+        response.headers['Cache-Control'] = 'public, max-age=31536000'
+    elif request.path.startswith('/api/'):
+        response.cache_control.max_age = 300  # 5 min for API
+        response.headers['Cache-Control'] = 'public, max-age=300'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    return response
+
 # ── Init DB on startup ────────────────────────────
 with app.app_context():
     db.init_db()

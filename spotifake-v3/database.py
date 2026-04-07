@@ -157,7 +157,30 @@ def _seed(conn):
         (32,"Garota de Ipanema","Tom Jobim","Getz/Gilberto","Bossa Nova",1962,"5:10","https://picsum.photos/seed/s32/300/300",audio(16),198000,"Olha que coisa mais linda\nMais cheia de graça\nÉ ela menina que vem e que passa"),
         (33,"Menina Veneno","Ritchie","Single","Rock Brasileiro",1983,"3:55","https://picsum.photos/seed/s33/300/300",audio(1),88000,"Menina veneno\nVocê me faz sentir\nTão bem assim"),
         (34,"Não Deixe o Samba Morrer","Alcione","Single","Samba",1975,"3:40","https://picsum.photos/seed/s34/300/300",audio(2),143000,"Não deixe o samba morrer\nNão deixe o samba acabar"),
-        (35,"Força Estranha","Caetano Veloso","Bicho","MPB",1977,"4:05","https://picsum.photos/seed/s35/300/300",audio(3),97000,"Hoje na avenida\nCortei os pés\nOs cacos de vidro")
+        (35,"Força Estranha","Caetano Veloso","Bicho","MPB",1977,"4:05","https://picsum.photos/seed/s35/300/300",audio(3),97000,"Hoje na avenida\nCortei os pés\nOs cacos de vidro"),
+        # Rock Brasileiro
+        (36,"Homem Amarelo","Gal Costa","Índia","Rock Psicodélico",1973,"2:45","https://picsum.photos/seed/s36/300/300",audio(4),76000,"Você que segue em frente\nPensa que é diferente\nMas é mentir pra si mesmo"),
+        (37,"Selvagem","Gilberto Gil","Refavela","MPB",1977,"4:18","https://picsum.photos/seed/s37/300/300",audio(5),84000,"Leve a sua vida pro pé da montanha\nSelvagem é a vida lá dentro do peito"),
+        (38,"Roda Gigante","Marisa Monte","Memórias","Pop Brasil",2000,"3:52","https://picsum.photos/seed/s38/300/300",audio(6),91000,"Era uma roda gigante\nGirando, girando dentro de mim"),
+        (39,"Lua","Criolo","Nó Na Orelha","Hip-Hop Brasil",2011,"4:05","https://picsum.photos/seed/s39/300/300",audio(7),68000,"Olha a lua, olha que beleza\nCírculo perfeito, completeza\nOlha a lua, que magnificência"),
+        (40,"Malandragem","Marcelo D2 & MV Bill","Single","Rap","2005","3:30","https://picsum.photos/seed/s40/300/300",audio(8),73000,"Malandragem não, malandragem sim\nNão é roubar, é meter a mão"),
+        # Eletrônico Brasileiro
+        (41,"Harmonia: O Caosmo","Carlinhos Brown","Guiné","Dance Brasil",2000,"3:15","https://picsum.photos/seed/s41/300/300",audio(9),62000,"Quando a gente aprende a entender\nA coisa fica de um jeito especial"),
+        (42,"Zumbi","BaianaSystem","Duas Cidades","Eletrônico Bossa",2017,"4:20","https://picsum.photos/seed/s42/300/300",audio(10),81000,"Zumbi na pista disparando\nNostalgia com tecnologia"),
+        (43,"Fé na Periferia","Emicida","Sobre Crianças, Quadris, Pesadelos","Rap","2015","3:42","https://picsum.photos/seed/s43/300/300",audio(11),75000,"Fé na periferia\nFé na labuta, fé na caminhada"),
+        (44,"Cálice","Chico Buarque & Gilberto Gil","Single","Protesto","1978","4:38","https://picsum.photos/seed/s44/300/300",audio(12),109000,"Pai, afasta de mim esse cálice\nPai, afasta de mim esse cálice"),
+        # Pop Latino
+        (45,"Despecha","Rosalía & Rauw Alejandro","Motomami","Reggaeton",2022,"3:01","https://picsum.photos/seed/s45/300/300",audio(13),187000,"De ti me voy a despejar\nCon otro perreo voy a empezar"),
+        (46,"MAMIII","Becky G & Karol G","Single","Reggaeton",2022,"3:20","https://picsum.photos/seed/s46/300/300",audio(14),195000,"Mamiii, me encanta tu sonrisa\nMamiii, eres una belleza"),
+        (47,"Un x100to","Grupo Frontera & Bad Bunny","Un x100to","Trap Latino",2023,"3:33","https://picsum.photos/seed/s47/300/300",audio(15),202000,"Me voy pa' Medellín, me voy pa' Medellín\nEsta es la vida real, real, real"),
+        (48,"Ella y Yo","Aventura","We Proudly Present","Reggaeton",2009,"4:33","https://picsum.photos/seed/s48/300/300",audio(16),156000,"Ella y yo somos uno en el amor\nTe amo más de lo que pueda imaginarte"),
+        # Forró / Tropicália
+        (49,"Forró Não é Lixo","Luiz Gonzaga & Jackson do Pandeiro","Clássicos","Forró",1958,"2:50","https://picsum.photos/seed/s49/300/300",audio(1),98000,"Forró não é lixo\nForró é uma coisa fina\nForró é coisa da gente"),
+        (50,"Ciranda Cirandinha","Gal Costa","Festa Para um Rei Negro","Tropicália",1973,"3:12","https://picsum.photos/seed/s50/300/300",audio(2),67000,"Ciranda, cirandinha\nCirandeiro da multidão\nCom a fé do ciranda"),
+        (52,"Sertão do Meu Coração","Xote das Meninas","Single","Forró",2005,"3:28","https://picsum.photos/seed/s52/300/300",audio(4),85000,"Sertão do meu coração\nCasarão branco de tradição"),
+        (53,"Canto da Cidade","Daniela Mercury","Ser Toda","Axé",1992,"3:45","https://picsum.photos/seed/s53/300/300",audio(5),91000,"No canto da cidade\nVem grito de protesto\nVem grito de saudade"),
+        (54,"Festa Não Acabou","Gal Costa","Flash Luz","Axé Tropicália",1985,"3:55","https://picsum.photos/seed/s54/300/300",audio(6),88000,"A festa não acabou\nVem ver o que é que tem"),
+        (55,"Travessia","Milton Nascimento","Migração","MPB",1978,"2:51","https://picsum.photos/seed/s55/300/300",audio(7),94000,"Travessia na loucura\nTravessia na ternura\nTravessia pra vencer")
     ]
 
     c.executemany('''INSERT OR IGNORE INTO songs
